@@ -1,0 +1,35 @@
+<div style="text-align:center">
+  <h2>
+    Welcome to Buddhika's {{ title }}!
+  </h2>
+</div>
+<div class="container-panel">
+  <div>
+  </div>
+  <div class="outer-panel">
+    <div class="display-panel">
+      <div class="display-view">
+        <span [ngStyle]="{'display:': displayBoard !== null}">{{displayBoard}}</span>
+      </div>
+    </div>
+    <div class="button-panel">
+      <div class="number-panel">
+        <ng-container *ngFor="let numberKey of nonOperationalKeys">
+          <button value="{{numberKey.name}}" (click)="onNumberKeyPress(numberKey.value)" class="number-key num align">
+            {{numberKey.value}}
+          </button>
+        </ng-container>
+      </div>
+      <div class="operation-panel">
+        <ng-container *ngFor="let operationalKey of operationalKeys">
+          <button value="{{operationalKey.value}}" (click)="onOperationalKeyPress(operationalKey.value)"
+                  class="operation-key value align operator">
+            {{operationalKey.name}}
+          </button>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+  <div></div>
+</div>
+
