@@ -1,6 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { isNullOrUndefined } from 'util';
-import { CalculatorButton, numberButtons, operationButtons } from './calculator-button';
+import { BasicOperationService } from './basic-operation.service';
+import {
+  CalculatorButton, ControlButton, controlButtons, numberButtons, OperationButton,
+  OperationFunctionHandler
+} from './calculator-button';
 
 @Component({
   selector: 'app-root',
@@ -10,31 +14,63 @@ import { CalculatorButton, numberButtons, operationButtons } from './calculator-
 export class AppComponent implements OnInit {
 
   title = 'Angular Calculator';
-  nonOperationalKeys: CalculatorButton[]; // Todo add them to a service
-  operationalKeys: CalculatorButton[]; // Todo add them to a service
+  nonOperationalKeys: CalculatorButton[];
+  operationalKeys: OperationButton[];
+  controlKeys: ControlButton[];
   displayBoard: String;
+  leftOperand: number;
+  rightOperand?: number;
+  currentOperation: OperationFunctionHandler;
+
+  constructor(private basicOperationService: BasicOperationService) {
+  }
 
   ngOnInit(): void {
     this.clearDisplayBoard();
     this.nonOperationalKeys = numberButtons;
-    this.operationalKeys = operationButtons;
+    this.operationalKeys = this.basicOperationService.fetchBasicOperations();
+    this.controlKeys = controlButtons;
   }
 
-  onNumberKeyPress(keyValue: string): void {
+  onNumberButtonClick(keyValue: string): void {
     this.displayValue(keyValue);
   }
 
-  onOperationalKeyPress(keyValue: string): void {
-    this.clearDisplayBoard();
-  }
-
-  private clearDisplayBoard(): void {
+  onOperationalButtonClick(handler: OperationFunctionHandler): void {
+    this.currentOperation = handler;
+    this.leftOperand = +this.displayBoard;
     this.displayBoard = String('');
   }
 
-  private displayValue(value: string) {
+  onControlButtonClick(value: string): void {
+    switch (value) {
+      case '=':
+        this.rightOperand = +this.displayBoard;
+        const result = this.currentOperation(this.leftOperand, this.rightOperand);
+        this.updateResult(result.result);
+        break;
+      case 'AC':
+        this.clearDisplayBoard();
+        break;
+      default:
+        this.clearDisplayBoard();
+    }
+  }
+
+  clearDisplayBoard(): void {
+    this.displayBoard = String('');
+    this.leftOperand = 0;
+    this.rightOperand = 0;
+    this.currentOperation = null;
+  }
+
+  displayValue(value: string) {
     if (!isNullOrUndefined(value)) {
       this.displayBoard = this.displayBoard.concat(value);
     }
+  }
+
+  updateResult(value: number) {
+    this.displayBoard = value + '';
   }
 }
