@@ -30,7 +30,7 @@
         </ng-container>
         <ng-container *ngFor="let controlKey of controlKeys">
           <button value="{{controlKey.value}}" (click)="onControlButtonClick(controlKey.value)"
-                  class="operation-key value align operator">
+                  class="control-key value align operator">
             {{controlKey.name}}
           </button>
         </ng-container>

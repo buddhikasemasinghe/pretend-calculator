@@ -1,7 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
-import { BasicOperationService } from './basic-operation.service';
-import { OperationButton } from './calculator-button';
+import { BasicOperationService } from './shared/basic-operation.service';
+import { OperationButton } from './model/calculator-button';
 
 describe('AppComponent', () => {
 
@@ -93,7 +93,13 @@ function overrideSetup() {
 
     fixture.detectChanges();
     const operationButtonPanel = compiled.querySelector('.operation-panel').querySelectorAll('.operation-key').length;
-    expect(operationButtonPanel).toBe(3);
+    expect(operationButtonPanel).toBe(1);
+  }));
+
+  it('should render Control button panel', async(() => {
+    fixture.detectChanges();
+    const operationButtonPanel = compiled.querySelector('.operation-panel').querySelectorAll('.control-key').length;
+    expect(operationButtonPanel).toBe(2);
   }));
 
   it('should render empty display panel', async(() => {
@@ -104,8 +110,7 @@ function overrideSetup() {
 
   it('should display single digit', async(() => {
     fixture.detectChanges();
-    const button = compiled.querySelector('.number-panel').querySelectorAll('[value="7"]');
-    button[0].click();
+    clickButton('number-panel', '7');
     fixture.detectChanges();
     const displayText = compiled.querySelector('.display-view span').textContent;
     expect(displayText).toBe('7');
@@ -113,13 +118,10 @@ function overrideSetup() {
 
   it('should display 4 digit number', async(() => {
     fixture.detectChanges();
-    const button2 = compiled.querySelector('.number-panel').querySelectorAll('[value="2"]');
-    button2[0].click();
-    const button0 = compiled.querySelector('.number-panel').querySelectorAll('[value="0"]');
-    button0[0].click();
-    const button1 = compiled.querySelector('.number-panel').querySelectorAll('[value="1"]');
-    button1[0].click();
-    button2[0].click();
+    clickButton('number-panel', '2');
+    clickButton('number-panel', '0');
+    clickButton('number-panel', '1');
+    clickButton('number-panel', '2');
     fixture.detectChanges();
     const displayText = compiled.querySelector('.display-view span').textContent;
     expect(displayText).toBe('2012');
@@ -127,15 +129,11 @@ function overrideSetup() {
 
   it('should display decimal value', async(() => {
     fixture.detectChanges();
-    const button1 = compiled.querySelector('.number-panel').querySelectorAll('[value="1"]');
-    button1[0].click();
-    const button0 = compiled.querySelector('.number-panel').querySelectorAll('[value="0"]');
-    button0[0].click();
-    const buttonPeriod = compiled.querySelector('.number-panel').querySelectorAll('[value="."]');
-    buttonPeriod[0].click();
-    button0[0].click();
-    const button6 = compiled.querySelector('.number-panel').querySelectorAll('[value="6"]');
-    button6[0].click();
+    clickButton('number-panel', '1');
+    clickButton('number-panel', '0');
+    clickButton('number-panel', '.');
+    clickButton('number-panel', '0');
+    clickButton('number-panel', '6');
     fixture.detectChanges();
     const displayText = compiled.querySelector('.display-view span').textContent;
     expect(displayText).toBe('10.06');
@@ -147,13 +145,22 @@ function overrideSetup() {
     basicOpServiceSpy.fetchBasicOperations = jasmine.createSpy('fetchBasicOperations').and.returnValue([plusOperation]);
 
     fixture.detectChanges();
-    const numberButton = compiled.querySelector('.number-panel').querySelectorAll('[value="7"]');
-    numberButton[0].click();
-    const button = compiled.querySelector('.operation-panel').querySelectorAll('[value="+"]');
-    button[0].click();
+    clickButton('number-panel', '7');
+    clickButton('operation-panel', '+');
     fixture.detectChanges();
     const displayText = compiled.querySelector('.display-view span').textContent;
     expect(displayText).toBe('');
   }));
+
+  it('should display clear results when operation + button is clicked', async(() => {
+
+  }));
+
+
+
+  function clickButton(classSelector, buttonValue) {
+    const button = compiled.querySelector('.' + classSelector).querySelectorAll('[value="' + buttonValue + '"]');
+    button[0].click();
+  }
 
 }

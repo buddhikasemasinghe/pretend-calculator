@@ -14,12 +14,12 @@ export interface ControlButton {
 }
 
 export class ComputeResult {
-  isNumber = true;
+  isValidNumber = true;
   result: number;
   errorMessage: string;
 }
 
-export type OperationFunctionHandler = (leftOperand: number, rightOperand?: number) => ComputeResult;
+export type OperationFunctionHandler = (leftOperand: string, rightOperand?: string) => ComputeResult;
 
 export const numberButtons: CalculatorButton[] = [
   {name: '7', value: '7'}, {name: '8', value: '8'}, {name: '9', value: '9'}, {name: '4', value: '4'},

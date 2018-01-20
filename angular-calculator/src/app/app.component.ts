@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { isNullOrUndefined } from 'util';
-import { BasicOperationService } from './basic-operation.service';
+import { BasicOperationService } from './shared/basic-operation.service';
 import {
-  CalculatorButton, ControlButton, controlButtons, numberButtons, OperationButton,
+  CalculatorButton, ComputeResult, ControlButton, controlButtons, numberButtons, OperationButton,
   OperationFunctionHandler
-} from './calculator-button';
+} from './model/calculator-button';
 
 @Component({
   selector: 'app-root',
@@ -17,10 +17,11 @@ export class AppComponent implements OnInit {
   nonOperationalKeys: CalculatorButton[];
   operationalKeys: OperationButton[];
   controlKeys: ControlButton[];
-  displayBoard: String;
-  leftOperand: number;
-  rightOperand?: number;
+  displayBoard: string;
+  leftOperand: string;
+  rightOperand?: string;
   currentOperation: OperationFunctionHandler;
+  isComputed: boolean;
 
   constructor(private basicOperationService: BasicOperationService) {
   }
@@ -38,16 +39,18 @@ export class AppComponent implements OnInit {
 
   onOperationalButtonClick(handler: OperationFunctionHandler): void {
     this.currentOperation = handler;
-    this.leftOperand = +this.displayBoard;
-    this.displayBoard = String('');
+    this.leftOperand = this.displayBoard;
+    this.rightOperand = null;
+    this.displayBoard = '';
   }
 
   onControlButtonClick(value: string): void {
     switch (value) {
       case '=':
-        this.rightOperand = +this.displayBoard;
+        this.rightOperand = this.displayBoard.length > 0 ? this.displayBoard : null;
         const result = this.currentOperation(this.leftOperand, this.rightOperand);
-        this.updateResult(result.result);
+        this.updateResult(result);
+        this.isComputed = true;
         break;
       case 'AC':
         this.clearDisplayBoard();
@@ -58,19 +61,28 @@ export class AppComponent implements OnInit {
   }
 
   clearDisplayBoard(): void {
-    this.displayBoard = String('');
-    this.leftOperand = 0;
-    this.rightOperand = 0;
+    this.displayBoard = '';
+    this.leftOperand = null;
+    this.rightOperand = null;
     this.currentOperation = null;
+    this.isComputed = false;
   }
 
   displayValue(value: string) {
     if (!isNullOrUndefined(value)) {
+      if (this.isComputed) {
+        this.displayBoard = '';
+        this.isComputed = false;
+      }
       this.displayBoard = this.displayBoard.concat(value);
     }
   }
 
-  updateResult(value: number) {
-    this.displayBoard = value + '';
+  updateResult(result: ComputeResult) {
+    if (result.isValidNumber) {
+      this.displayBoard = result.result + '';
+    } else {
+      this.displayBoard = result.errorMessage;
+    }
   }
 }

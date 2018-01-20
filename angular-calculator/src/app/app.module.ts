@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 
 
 import { AppComponent } from './app.component';
-import { BasicOperationService } from './basic-operation.service';
+import { BasicOperationService } from './shared/basic-operation.service';
 
 
 @NgModule({
