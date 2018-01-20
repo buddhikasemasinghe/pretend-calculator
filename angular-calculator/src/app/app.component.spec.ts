@@ -1,12 +1,13 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+
 import { AppComponent } from './app.component';
-import { BasicOperationService } from './shared/basic-operation.service';
 import { OperationButton } from './model/calculator-button';
+import { BasicOperationService } from './shared/basic-operation.service';
+import { DisplayService } from './shared/display.service';
 
 describe('AppComponent', () => {
 
   beforeEach(() => {
-
   });
   describe('when override its provided AppComponent', overrideSetup);
 });
@@ -15,6 +16,7 @@ function overrideSetup() {
 
   let fixture: ComponentFixture<AppComponent>;
   let basicOpServiceSpy: BasicOperationServiceSpy;
+  let displayServiceSpy: DisplayServiceSpy;
   let compiled: any;
 
   class BasicOperationServiceSpy {
@@ -24,17 +26,38 @@ function overrideSetup() {
     );
   }
 
+  class DisplayServiceSpy {
+
+    getScreenDisplay = jasmine.createSpy('getScreenDisplay').and.callFake(
+      () => []
+    );
+
+    updateComputeResult = jasmine.createSpy('updateComputeResult').and.callFake(
+      () => []
+    );
+
+    handleNumberKeyPress = jasmine.createSpy('handleNumberKeyPress').and.callFake(
+      () => []
+    );
+
+    resetScreen = jasmine.createSpy('resetScreen').and.callFake(
+      () => []
+    );
+  }
+
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [
         AppComponent
       ],
-      providers: [{provide: BasicOperationService, useValue: {}}]
+      providers: [{provide: BasicOperationService, useValue: {}},
+        {provide: DisplayService, useValue: {}}]
     })
       .overrideComponent(AppComponent, {
         set: {
           providers: [
-            {provide: BasicOperationService, useClass: BasicOperationServiceSpy}
+            {provide: BasicOperationService, useClass: BasicOperationServiceSpy},
+            {provide: DisplayService, useClass: DisplayServiceSpy}
           ]
         }
       })
@@ -46,8 +69,8 @@ function overrideSetup() {
   }));
 
   beforeEach(async(() => {
-    // get the component's injected HeroDetailServiceSpy
     basicOpServiceSpy = fixture.debugElement.injector.get(BasicOperationService) as any;
+    displayServiceSpy = fixture.debugElement.injector.get(DisplayService) as any;
   }));
 
   it('should create the app', async(() => {
@@ -108,15 +131,27 @@ function overrideSetup() {
     expect(displayText).toBe('');
   }));
 
-  it('should display single digit', async(() => {
+  it('should have called `handleNumberKeyPress`', () => {
     fixture.detectChanges();
     clickButton('number-panel', '7');
     fixture.detectChanges();
+    expect(displayServiceSpy.handleNumberKeyPress.calls.count()).toBe(1, 'handleNumberKeyPress called once');
+  });
+
+  it('should display 4 digit number', async(() => {
+    fixture.detectChanges();
+    clickButton('number-panel', '2');
+    clickButton('number-panel', '0');
+    clickButton('number-panel', '1');
+    clickButton('number-panel', '2');
+    fixture.detectChanges();
     const displayText = compiled.querySelector('.display-view span').textContent;
-    expect(displayText).toBe('7');
+    expect(displayServiceSpy.handleNumberKeyPress.calls.count()).toBe(4, 'handleNumberKeyPress called 4 times');
   }));
 
   it('should display 4 digit number', async(() => {
+    displayServiceSpy.getScreenDisplay = jasmine.createSpy('getScreenDisplay').and.returnValue('2012');
+
     fixture.detectChanges();
     clickButton('number-panel', '2');
     clickButton('number-panel', '0');
@@ -128,6 +163,8 @@ function overrideSetup() {
   }));
 
   it('should display decimal value', async(() => {
+    displayServiceSpy.getScreenDisplay = jasmine.createSpy('getScreenDisplay').and.returnValue('10.06');
+
     fixture.detectChanges();
     clickButton('number-panel', '1');
     clickButton('number-panel', '0');
@@ -137,6 +174,7 @@ function overrideSetup() {
     fixture.detectChanges();
     const displayText = compiled.querySelector('.display-view span').textContent;
     expect(displayText).toBe('10.06');
+    expect(displayServiceSpy.handleNumberKeyPress.calls.count()).toBe(5, 'handleNumberKeyPress called 5 times');
   }));
 
   it('should display clear results when operation + button is clicked', async(() => {
@@ -155,8 +193,6 @@ function overrideSetup() {
   it('should display clear results when operation + button is clicked', async(() => {
 
   }));
-
-
 
   function clickButton(classSelector, buttonValue) {
     const button = compiled.querySelector('.' + classSelector).querySelectorAll('[value="' + buttonValue + '"]');
