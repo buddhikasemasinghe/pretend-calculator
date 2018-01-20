@@ -1,4 +1,4 @@
-import { TestBed, inject, async } from '@angular/core/testing';
+import { async, inject, TestBed } from '@angular/core/testing';
 
 import { BasicOperationService } from './basic-operation.service';
 
@@ -147,7 +147,7 @@ describe('BasicOperationService', () => {
     expect(computeResult.result).toBe(3.33333333333);
   }));
 
-  it('should return  for -4 / 2', async(() => {
+  it('should return -2 for -4 / 2', async(() => {
     const service = new BasicOperationService();
     const divideOperation = service.fetchBasicOperations().filter(operation => operation.displayName === '/');
     const computeResult = divideOperation[0].handler('-4', '2');
@@ -164,7 +164,7 @@ describe('BasicOperationService', () => {
     expect(computeResult.result).toBe(35);
   }));
 
-  it('should return -5 for  -5 / undefined', async(() => {
+  it('should return 1 for  -5 / undefined', async(() => {
     const service = new BasicOperationService();
     const divideOperation = service.fetchBasicOperations().filter(operation => operation.displayName === '/');
     const computeResult = divideOperation[0].handler('-5');
