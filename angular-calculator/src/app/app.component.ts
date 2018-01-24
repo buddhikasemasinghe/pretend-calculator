@@ -40,6 +40,8 @@ export class AppComponent implements OnInit {
     this.isComputed = this.displayService.handleNumberKeyPress(keyValue, this.isComputed);
   }
 
+  // Todo This need to be refactored once new complex operations are added to the system
+  // Assume that when operation button is click it should reset the screen
   onOperationalButtonClick(handler: OperationFunctionHandler): void {
     this.currentOperation = handler;
     this.leftOperand = this.displayService.getScreenDisplay();
@@ -47,6 +49,7 @@ export class AppComponent implements OnInit {
     this.displayService.resetScreen();
   }
 
+  // Todo this is candidate to move to another service if there is a requirement to add more control buttons/functionalities
   onControlButtonClick(value: string): void {
     switch (value) {
       case '=':

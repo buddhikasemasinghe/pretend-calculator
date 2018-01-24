@@ -2,6 +2,9 @@ import { Injectable } from '@angular/core';
 import { isNullOrUndefined } from 'util';
 import { ComputeResult } from '../model/calculator-button';
 
+/**
+ * This service is responsible for update the display panel in the calculator
+ */
 @Injectable()
 export class DisplayService {
   private screenDisplay: string;
@@ -37,5 +40,4 @@ export class DisplayService {
   resetScreen(): void {
     this.screenDisplay = '';
   }
-
 }
